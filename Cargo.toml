@@ -9,6 +9,10 @@ edition = "2018"
 categories = ["algorithms"]
 keywords = ["astar", "jps", "jump point search"]
 version = "0.1.0"
+exclude = [
+    ".github/*",
+    "*.txt"
+]
 
 [dependencies]
 ndarray = "0.13"
