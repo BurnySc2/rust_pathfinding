@@ -1,12 +1,16 @@
 [package]
-name = "my_library"
-version = "0.1.0"
+name = "py_pathfinding"
+description = "A* and Jump-Point-Search algorithms using ndarray which makes them easy to use in pyo3"
 authors = ["BuRny <gamingburny@gmail.com>"]
+repository = "https://github.com/BurnySc2/rust_pathfinding"
+readme = "README.md"
+license = "MIT"
 edition = "2018"
+categories = ["algorithms"]
+keywords = ["astar", "jps", "jump point search"]
+version = "0.1.0"
 
 [dependencies]
 ndarray = "0.13"
-#pathfinding = "2.0"
 indexmap = "1.3"
-#pretty_assertions = "0.6.1"
 fnv = "1.0.6"
