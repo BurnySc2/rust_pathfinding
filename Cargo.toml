@@ -12,9 +12,8 @@ exclude = [
     ".github/*",
     "*.txt"
 ]
-version = "0.1.1"
+version = "0.1.3"
 
 [dependencies]
 ndarray = "0.13"
-indexmap = "1.3"
 fnv = "1.0.6"

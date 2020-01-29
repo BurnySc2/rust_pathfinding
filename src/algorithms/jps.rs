@@ -396,6 +396,7 @@ impl PathFinder {
 
         // Clear from last run
         self.jump_points.clear();
+        // TODO hashmap clear seems super slow, replace with Array2<u8> that only stores the direction JPS came from
         self.came_from.clear();
 
         // Add 4 starting nodes (diagonal traversals) around source point
