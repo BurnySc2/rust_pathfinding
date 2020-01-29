@@ -9,11 +9,9 @@ use std::io::prelude::*;
 pub mod algorithms;
 
 fn write_path_to_file(path: Vec<algorithms::jps::Point2d>) {
-    //    let mut tuple_vec = vec![];
     let mut file = File::create("path.txt").unwrap();
     for i in path.iter() {
         let algorithms::jps::Point2d { x, y } = i;
-        //        tuple_vec.push((x, y));
         file.write_fmt(format_args!("{},{}\n", x, y));
     }
 }
@@ -22,6 +20,7 @@ fn main() {
     //    // Test on actual map AutomatonLE.txt
     let result = algorithms::jps::read_grid_from_file(String::from("AutomatonLE.txt"));
     let (array, _height, _width) = result.unwrap();
+    // A simple short path example around a corner or two
     //        let source = algorithms::jps::Point2d { x: 70, y: 100 };
     //        let target = algorithms::jps::Point2d { x: 100, y: 114 };
 
