@@ -60,5 +60,5 @@ jobs:
 
     - name: Publish
       continue-on-error: true
-      run: cargo publish --token ${{ secrets.ACCESS_TOKEN }}
+      run: cargo publish --token --allow-dirty ${{ secrets.ACCESS_TOKEN }}
       if: matrix.os == 'ubuntu-latest'

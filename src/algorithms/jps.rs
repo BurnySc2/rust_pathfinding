@@ -407,8 +407,6 @@ impl PathFinder {
         ]
         .iter()
         {
-            let _left_blocked = self.new_point_in_grid(source, dir.left()).is_none();
-            let _right_blocked = self.new_point_in_grid(source, dir.right()).is_none();
             self.jump_points.push(JumpPoint {
                 start: *source,
                 direction: *dir,
