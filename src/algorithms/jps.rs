@@ -15,7 +15,7 @@ use fnv::FnvHashMap;
 // use fnv::FnvHasher;
 
 #[allow(dead_code)]
-pub fn absdiff<T>(x: T, y: T) -> T
+fn absdiff<T>(x: T, y: T) -> T
 where
     T: Sub<Output = T> + PartialOrd,
 {
@@ -164,11 +164,19 @@ impl Direction {
 /// A struct for saving coordinates
 #[derive(Debug, Hash, Eq, PartialEq, Copy, Clone)]
 pub struct Point2d {
-    pub x: usize,
-    pub y: usize,
+    x: usize,
+    y: usize,
 }
 
 impl Point2d {
+    pub fn new(x: usize, y: usize) -> Self {
+        Point2d { x, y }
+    }
+
+    pub fn unpack(&self) -> (usize, usize) {
+        (self.x, self.y)
+    }
+
     /// Helper function for quickly summing a point with a direction
     fn add_direction(&self, other: Direction) -> Point2d {
         Point2d {
@@ -344,7 +352,7 @@ impl PathFinder {
     }
 
     /// The find path algorithm which creates 8 starting jump points around the start point, then only traverses those
-    fn find_path(&mut self, source: &Point2d, target: &Point2d) -> Vec<Point2d> {
+    pub fn find_path(&mut self, source: &Point2d, target: &Point2d) -> Vec<Point2d> {
         if !self.is_in_grid_bounds(source) {
             println!(
                 "Returning early, source position is not within grid bounds: {:?}",
@@ -383,8 +391,12 @@ impl PathFinder {
             "euclidean" => heuristic = euclidean_heuristic,
             // Memory overflow!
             // "none" => heuristic = no_heuristic,
-            _ => heuristic = euclidean_heuristic,
+            _ => heuristic = octal_heuristic,
         }
+
+        // Clear from last run
+        self.jump_points.clear();
+        self.came_from.clear();
 
         // Add 4 starting nodes (diagonal traversals) around source point
         for dir in [
@@ -534,15 +546,31 @@ impl PathFinder {
             traversed_count += 1;
         }
     }
-}
 
-/// A helper function for running tests
-pub fn jps_pf(grid: Array2<u8>) -> PathFinder {
-    PathFinder {
-        grid,
-        heuristic: String::from("octal"),
-        jump_points: BinaryHeap::with_capacity(100),
-        came_from: FnvHashMap::default(),
+    /// Quickly create new pathfinder
+    pub fn new(grid: Array2<u8>, heuristic: &String) -> Self {
+        PathFinder {
+            grid,
+            heuristic: heuristic.clone(),
+            jump_points: BinaryHeap::with_capacity(50),
+            came_from: FnvHashMap::default(),
+        }
+    }
+
+    /// A helper function to set up a square grid, border of the grid is set to 0, other values are set to 1
+    pub fn create_square_grid(size: usize) -> Array2<u8> {
+        // https://stackoverflow.com/a/59043086/10882657
+        let mut ndarray = Array2::<u8>::ones((size, size));
+        // Set boundaries
+        for y in 0..size {
+            ndarray[[y, 0]] = 0;
+            ndarray[[y, size - 1]] = 0;
+        }
+        for x in 0..size {
+            ndarray[[0, x]] = 0;
+            ndarray[[size - 1, x]] = 0;
+        }
+        ndarray
     }
 }
 
@@ -551,21 +579,6 @@ pub fn jps_test(pf: &mut PathFinder, source: &Point2d, target: &Point2d) -> Vec<
     pf.find_path(&source, &target)
 }
 
-/// A helper function to set up a square grid, border of the grid is set to 0, other values are set to 1
-pub fn grid_setup(size: usize) -> Array2<u8> {
-    // https://stackoverflow.com/a/59043086/10882657
-    let mut ndarray = Array2::<u8>::ones((size, size));
-    // Set boundaries
-    for y in 0..size {
-        ndarray[[y, 0]] = 0;
-        ndarray[[y, size - 1]] = 0;
-    }
-    for x in 0..size {
-        ndarray[[0, x]] = 0;
-        ndarray[[size - 1, x]] = 0;
-    }
-    ndarray
-}
 
 use std::fs::File;
 use std::io::Read;
@@ -610,7 +623,7 @@ mod tests {
         // Main ramp to main ramp
         // let source = Point2d { x: 32, y: 51 };
         // let target = Point2d { x: 150, y: 129 };
-        let mut pf = jps_pf(array);
+        let mut pf = PathFinder::new(array, &String::from("octal"));
         let path = jps_test(&mut pf, &source, &target);
         assert_ne!(0, path.len());
         // Run bench
@@ -633,7 +646,7 @@ mod tests {
             }
         }
 
-        let mut pf = jps_pf(array);
+        let mut pf = PathFinder::new(array, &String::from("octal"));
         let path = jps_test(&mut pf, &source, &target);
         assert_eq!(0, path.len());
         // Run bench
@@ -642,8 +655,8 @@ mod tests {
 
     #[bench]
     fn bench_jps_test_out_of_bounds1(b: &mut Bencher) {
-        let grid = grid_setup(30);
-        let mut pf = jps_pf(grid);
+        let grid = PathFinder::create_square_grid(30);
+        let mut pf = PathFinder::new(grid, &String::from("octal"));
         let source: Point2d = Point2d { x: 500, y: 5 };
         let target: Point2d = Point2d { x: 10, y: 12 };
         let path = jps_test(&mut pf, &source, &target);
@@ -653,8 +666,8 @@ mod tests {
 
     #[bench]
     fn bench_jps_test_out_of_bounds2(b: &mut Bencher) {
-        let grid = grid_setup(30);
-        let mut pf = jps_pf(grid);
+        let grid = PathFinder::create_square_grid(30);
+        let mut pf = PathFinder::new(grid, &String::from("octal"));
         let source: Point2d = Point2d { x: 5, y: 5 };
         let target: Point2d = Point2d { x: 500, y: 12 };
         let path = jps_test(&mut pf, &source, &target);
@@ -664,8 +677,8 @@ mod tests {
 
     #[bench]
     fn bench_jps_test(b: &mut Bencher) {
-        let grid = grid_setup(30);
-        let mut pf = jps_pf(grid);
+        let grid = PathFinder::create_square_grid(30);
+        let mut pf = PathFinder::new(grid, &String::from("octal"));
         let source: Point2d = Point2d { x: 5, y: 5 };
         let target: Point2d = Point2d { x: 10, y: 12 };
         b.iter(|| jps_test(&mut pf, &source, &target));

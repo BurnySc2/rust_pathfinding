@@ -8,11 +8,11 @@ license = "MIT"
 edition = "2018"
 categories = ["algorithms"]
 keywords = ["astar", "jps", "jumppointsearch"]
-version = "0.1.0"
 exclude = [
     ".github/*",
     "*.txt"
 ]
+version = "0.1.1"
 
 [dependencies]
 ndarray = "0.13"

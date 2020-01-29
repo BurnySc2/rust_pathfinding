@@ -11,7 +11,8 @@ pub mod algorithms;
 fn write_path_to_file(path: Vec<algorithms::jps::Point2d>) {
     let mut file = File::create("path.txt").unwrap();
     for i in path.iter() {
-        let algorithms::jps::Point2d { x, y } = i;
+        //        let algorithms::jps::Point2d { x, y } = i;
+        let (x, y) = i.unpack();
         file.write_fmt(format_args!("{},{}\n", x, y));
     }
 }
@@ -25,13 +26,13 @@ fn main() {
     //        let target = algorithms::jps::Point2d { x: 100, y: 114 };
 
     // Spawn to spawn
-    let source = algorithms::jps::Point2d { x: 29, y: 65 };
-    let target = algorithms::jps::Point2d { x: 154, y: 114 };
+    let source = algorithms::jps::Point2d::new(29, 65);
+    let target = algorithms::jps::Point2d::new(154, 114);
 
     // Main ramp to main ramp
     //    let source = algorithms::jps::Point2d { x: 32, y: 51 };
     //    let target = algorithms::jps::Point2d { x: 150, y: 129 };
-    let mut pf = algorithms::jps::jps_pf(array);
+    let mut pf = algorithms::jps::PathFinder::new(array, &String::from("octal"));
     let path = algorithms::jps::jps_test(&mut pf, &source, &target);
     println!("Path: {:?}", path);
 
