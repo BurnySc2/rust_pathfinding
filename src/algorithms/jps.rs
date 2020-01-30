@@ -283,7 +283,11 @@ impl PathFinder {
 
     /// Checks if the point is in the grid. Careful, the 2d grid needs to be similar to numpy arrays, so row major. Grid[y][x]
     fn is_in_grid(&self, point: &Point2d) -> bool {
-        self.grid[point.y][point.x] == 1
+//        self.grid[point.y][point.x] == 1
+        unsafe {
+            *self.grid.get_unchecked(point.y).get_unchecked(point.x) == 1
+        }
+
     }
 
     /// Returns an option of a Point2d if the point in that direction is not a wall.
@@ -700,27 +704,27 @@ mod tests {
         b.iter(|| jps_test(&mut pf, &source, &target, false));
     }
 
-//    #[bench]
-//    fn bench_jps_test_out_of_bounds1(b: &mut Bencher) {
-//        let grid = PathFinder::create_square_grid(30);
-//        let mut pf = PathFinder::new(grid, &String::from("octal"));
-//        let source: Point2d = Point2d { x: 500, y: 5 };
-//        let target: Point2d = Point2d { x: 10, y: 12 };
-//        let path = jps_test(&mut pf, &source, &target, true);
-//        assert_eq!(0, path.len());
-//        b.iter(|| jps_test(&mut pf, &source, &target, false));
-//    }
-//
-//    #[bench]
-//    fn bench_jps_test_out_of_bounds2(b: &mut Bencher) {
-//        let grid = PathFinder::create_square_grid(30);
-//        let mut pf = PathFinder::new(grid, &String::from("octal"));
-//        let source: Point2d = Point2d { x: 5, y: 5 };
-//        let target: Point2d = Point2d { x: 500, y: 12 };
-//        let path = jps_test(&mut pf, &source, &target, true);
-//        assert_eq!(0, path.len());
-//        b.iter(|| jps_test(&mut pf, &source, &target, false));
-//    }
+    //    #[bench]
+    //    fn bench_jps_test_out_of_bounds1(b: &mut Bencher) {
+    //        let grid = PathFinder::create_square_grid(30);
+    //        let mut pf = PathFinder::new(grid, &String::from("octal"));
+    //        let source: Point2d = Point2d { x: 500, y: 5 };
+    //        let target: Point2d = Point2d { x: 10, y: 12 };
+    //        let path = jps_test(&mut pf, &source, &target, true);
+    //        assert_eq!(0, path.len());
+    //        b.iter(|| jps_test(&mut pf, &source, &target, false));
+    //    }
+    //
+    //    #[bench]
+    //    fn bench_jps_test_out_of_bounds2(b: &mut Bencher) {
+    //        let grid = PathFinder::create_square_grid(30);
+    //        let mut pf = PathFinder::new(grid, &String::from("octal"));
+    //        let source: Point2d = Point2d { x: 5, y: 5 };
+    //        let target: Point2d = Point2d { x: 500, y: 12 };
+    //        let path = jps_test(&mut pf, &source, &target, true);
+    //        assert_eq!(0, path.len());
+    //        b.iter(|| jps_test(&mut pf, &source, &target, false));
+    //    }
 
     #[bench]
     fn bench_jps_test1(b: &mut Bencher) {
