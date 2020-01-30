@@ -253,7 +253,7 @@ pub struct PathFinder {
     ///     [0, 1, 1, 0],
     ///     [0, 0, 0, 0],
     /// ]
-    grid: Array2<u8>,
+    grid: [[u8; 300]; 300],
     /// May be 'manhattan', 'octal' or 'euclidean'. 'octal' should probably be the best choice here
     heuristic: String,
     jump_points: BinaryHeap<JumpPoint>,
@@ -274,15 +274,16 @@ impl PathFinder {
 
     /// Checks if the point is in the grid. Careful, the 2d grid needs to be similar to numpy arrays, so row major. Grid[y][x]
     fn is_in_grid_bounds(&self, point: &Point2d) -> bool {
-        let dim = self.grid.raw_dim();
-        let (height, width) = (dim[0], dim[1]);
-        // No need to test for 0 <= point.x since usize is used
-        return point.x < width && point.y < height;
+        true
+//        let dim = self.grid.raw_dim();
+//        let (height, width) = (dim[0], dim[1]);
+//        // No need to test for 0 <= point.x since usize is used
+//        return point.x < width && point.y < height;
     }
 
     /// Checks if the point is in the grid. Careful, the 2d grid needs to be similar to numpy arrays, so row major. Grid[y][x]
     fn is_in_grid(&self, point: &Point2d) -> bool {
-        self.grid[[point.y, point.x]] == 1
+        self.grid[point.y][point.x] == 1
     }
 
     /// Returns an option of a Point2d if the point in that direction is not a wall.
@@ -434,9 +435,9 @@ impl PathFinder {
                     println!("Found goal: {:?} {:?}", &start, &target);
                     println!("Size of open list: {:?}", self.jump_points.len());
                     println!("Size of came from: {:?}", self.came_from.len());
-                    println!("Grid dimension {:?}", self.grid.raw_dim());
-                    println!("Total nodes (including walls) in grid {:?}", self.grid.len());
-                    println!("Total walkable nodes in grid {:?}", self.grid.sum());
+//                    println!("Grid dimension {:?}", self.grid.raw_dim());
+//                    println!("Total nodes (including walls) in grid {:?}", self.grid.len());
+//                    println!("Total walkable nodes in grid {:?}", self.grid.sum());
                     println!("Size visited: {:?}", self.debug_visited_nodes.len());
                     let now = Instant::now();
                     for point in &self.debug_visited_nodes{
@@ -576,7 +577,7 @@ impl PathFinder {
     /// Quickly create new pathfinder
     pub fn new(grid: Array2<u8>, heuristic: &String) -> Self {
         PathFinder {
-            grid,
+            grid: PathFinder::convert_ndarray_to_stack_array(&grid),
             heuristic: heuristic.clone(),
             jump_points: BinaryHeap::with_capacity(50),
             came_from: FnvHashMap::default(),
@@ -584,7 +585,7 @@ impl PathFinder {
         }
     }
 
-    fn convert_ndarray_to_stack_array(grid: Array2<u8>) -> [[u8; 300]; 300] {
+    fn convert_ndarray_to_stack_array(grid: &Array2<u8>) -> [[u8; 300]; 300] {
         let mut array = [[0u8;300];300];
         let height = grid.raw_dim()[0];
         let width = grid.raw_dim()[1];
@@ -620,6 +621,7 @@ pub fn jps_test(pf: &mut PathFinder, source: &Point2d, target: &Point2d, debug: 
 
 use std::fs::File;
 use std::io::Read;
+use std::path::Path;
 
 /// A helper function to read the grid from file
 pub fn read_grid_from_file(path: String) -> Result<(Array2<u8>, u32, u32), std::io::Error> {
