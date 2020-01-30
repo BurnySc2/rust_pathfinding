@@ -16,4 +16,4 @@ exclude = [
 
 [dependencies]
 ndarray = "0.13"
-fnv = "1.0.6"
+fasthash = "0.4"

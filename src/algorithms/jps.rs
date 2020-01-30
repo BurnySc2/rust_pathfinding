@@ -1,7 +1,7 @@
 // https://github.com/mikolalysenko/l1-path-finder
 
 // https://en.wikipedia.org/wiki/Jump_point_search
-use std::collections::{BinaryHeap, HashSet};
+use std::collections::{BinaryHeap, HashMap, HashSet};
 
 use std::cmp::Ordering;
 use std::f32::consts::SQRT_2;
@@ -11,8 +11,7 @@ use std::ops::Sub;
 use ndarray::Array;
 use ndarray::Array2;
 
-use fnv::FnvHashMap;
-// use fnv::FnvHasher;
+use fasthash::sea::Hash64;
 
 use std::thread::sleep;
 use std::time::{Duration, Instant};
@@ -258,7 +257,7 @@ pub struct PathFinder {
     heuristic: String,
     jump_points: BinaryHeap<JumpPoint>,
     /// Contains points which were already visited to construct the path once the goal is found
-    came_from: FnvHashMap<Point2d, Point2d>,
+    came_from: HashMap<Point2d, Point2d, Hash64>,
     debug_visited_nodes: HashSet<Point2d>,
 }
 
@@ -283,11 +282,7 @@ impl PathFinder {
 
     /// Checks if the point is in the grid. Careful, the 2d grid needs to be similar to numpy arrays, so row major. Grid[y][x]
     fn is_in_grid(&self, point: &Point2d) -> bool {
-//        self.grid[point.y][point.x] == 1
-        unsafe {
-            *self.grid.get_unchecked(point.y).get_unchecked(point.x) == 1
-        }
-
+        unsafe { *self.grid.get_unchecked(point.y).get_unchecked(point.x) == 1 }
     }
 
     /// Returns an option of a Point2d if the point in that direction is not a wall.
@@ -586,7 +581,7 @@ impl PathFinder {
             grid: PathFinder::convert_ndarray_to_stack_array(&grid),
             heuristic: heuristic.clone(),
             jump_points: BinaryHeap::with_capacity(50),
-            came_from: FnvHashMap::default(),
+            came_from: HashMap::with_capacity_and_hasher(200, Hash64),
             debug_visited_nodes: HashSet::new(),
         }
     }
