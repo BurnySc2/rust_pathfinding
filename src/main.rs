@@ -33,7 +33,7 @@ fn main() {
     //    let source = algorithms::jps::Point2d { x: 32, y: 51 };
     //    let target = algorithms::jps::Point2d { x: 150, y: 129 };
     let mut pf = algorithms::jps::PathFinder::new(array, &String::from("octal"));
-    let path = algorithms::jps::jps_test(&mut pf, &source, &target);
+    let path = algorithms::jps::jps_test(&mut pf, &source, &target, false);
     println!("Path: {:?}", path);
 
     // Test on empty 100x100 grid

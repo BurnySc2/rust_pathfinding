@@ -72,7 +72,7 @@ dependencies = [
 
 [[package]]
 name = "py_pathfinding"
-version = "0.1.4"
+version = "0.1.5"
 dependencies = [
  "fnv 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "ndarray 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
